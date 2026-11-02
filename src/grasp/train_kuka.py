@@ -68,7 +68,8 @@ def retry_operating_point(y: np.ndarray, p_success: np.ndarray, min_precision: f
     precision = hits / flagged
     ok = np.where(precision >= min_precision)[0]
     if len(ok) == 0:
-        return {"failure_precision": None, "failure_recall": 0.0, "threshold": None}
+        return {"failure_precision": None, "failure_recall": 0.0,
+                "threshold_p_success": None, "flagged_share": 0.0}
     i = ok.max()
     return {"failure_precision": float(precision[i]), "failure_recall": float(hits[i] / fail.sum()),
             "threshold_p_success": float(p_success[order][i]), "flagged_share": float(flagged[i] / len(y))}

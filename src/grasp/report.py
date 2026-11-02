@@ -76,6 +76,11 @@ def uci_chart(uci: pd.DataFrame) -> None:
     fig.savefig(ASSETS / "uci_macro_f1.png", dpi=150)
 
 
+def records(df: pd.DataFrame) -> list[dict]:
+    """DataFrame rows as dicts with NaN turned into null, so the JSON stays valid."""
+    return df.astype(object).where(df.notna(), None).to_dict("records")
+
+
 def main() -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
     kuka = pd.DataFrame(json.loads((ART / "kuka_results.json").read_text()))
@@ -90,9 +95,8 @@ def main() -> None:
     cells = per_cell(con)
     dq_chart(dq)
     uci_chart(uci)
-    bundle = {"counts": {k: float(v) for k, v in counts.items()}, "kuka": kuka.to_dict("records"),
-              "uci": uci.to_dict("records"), "dq": dq.to_dict("records"),
-              "cells": cells.to_dict("records"),
+    bundle = {"counts": {k: float(v) for k, v in counts.items()}, "kuka": records(kuka),
+              "uci": records(uci), "dq": records(dq), "cells": records(cells),
               "shap": json.loads((ART / "shap_kuka_k3.json").read_text())}
     (ASSETS / "metrics.json").write_text(json.dumps(bundle, indent=2, default=float))
     print(cells.round(3).to_string(index=False))

@@ -17,11 +17,10 @@
       "pr_auc_std": 0.0841087262783761,
       "roc_auc_pooled": 0.5,
       "pr_auc_pooled": 0.3097198100397794,
-      "retry_failure_precision": NaN,
+      "retry_failure_precision": null,
       "retry_failure_recall": 0.0,
-      "retry_threshold": NaN,
-      "retry_threshold_p_success": NaN,
-      "retry_flagged_share": NaN
+      "retry_threshold_p_success": null,
+      "retry_flagged_share": 0.0
     },
     {
       "k": 2,
@@ -36,7 +35,6 @@
       "pr_auc_pooled": 0.5323812521657015,
       "retry_failure_precision": 0.9028571428571428,
       "retry_failure_recall": 0.14170403587443947,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.1236318051815033,
       "retry_flagged_share": 0.10300176574455562
     },
@@ -53,7 +51,6 @@
       "pr_auc_pooled": 0.513788630591492,
       "retry_failure_precision": 0.9016393442622951,
       "retry_failure_recall": 0.24663677130044842,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.11527444422245026,
       "retry_flagged_share": 0.17951736315479694
     },
@@ -70,7 +67,6 @@
       "pr_auc_pooled": 0.5021205720380144,
       "retry_failure_precision": 0.9,
       "retry_failure_recall": 0.1937219730941704,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.018101878464221954,
       "retry_flagged_share": 0.14125956444967627
     },
@@ -85,11 +81,10 @@
       "pr_auc_std": 0.08491211883000438,
       "roc_auc_pooled": 0.5,
       "pr_auc_pooled": 0.3120463917718257,
-      "retry_failure_precision": NaN,
+      "retry_failure_precision": null,
       "retry_failure_recall": 0.0,
-      "retry_threshold": NaN,
-      "retry_threshold_p_success": NaN,
-      "retry_flagged_share": NaN
+      "retry_threshold_p_success": null,
+      "retry_flagged_share": 0.0
     },
     {
       "k": 3,
@@ -104,7 +99,6 @@
       "pr_auc_pooled": 0.5340301969131342,
       "retry_failure_precision": 0.9,
       "retry_failure_recall": 0.1226158038147139,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.1181124672293663,
       "retry_flagged_share": 0.08902077151335312
     },
@@ -121,7 +115,6 @@
       "pr_auc_pooled": 0.5452318160344037,
       "retry_failure_precision": 0.9026845637583892,
       "retry_failure_recall": 0.24432334241598547,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.12021008878946304,
       "retry_flagged_share": 0.1768545994065282
     },
@@ -138,7 +131,6 @@
       "pr_auc_pooled": 0.5288282400363795,
       "retry_failure_precision": 0.9038461538461539,
       "retry_failure_recall": 0.08537693006357856,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.0011529388139024377,
       "retry_flagged_share": 0.06172106824925816
     },
@@ -153,11 +145,10 @@
       "pr_auc_std": 0.08489261694796084,
       "roc_auc_pooled": 0.5,
       "pr_auc_pooled": 0.31259119819861203,
-      "retry_failure_precision": NaN,
+      "retry_failure_precision": null,
       "retry_failure_recall": 0.0,
-      "retry_threshold": NaN,
-      "retry_threshold_p_success": NaN,
-      "retry_flagged_share": NaN
+      "retry_threshold_p_success": null,
+      "retry_flagged_share": 0.0
     },
     {
       "k": 4,
@@ -172,7 +163,6 @@
       "pr_auc_pooled": 0.5442007373128711,
       "retry_failure_precision": 0.9,
       "retry_failure_recall": 0.09854014598540146,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.095815509557724,
       "retry_flagged_share": 0.07142857142857142
     },
@@ -189,7 +179,6 @@
       "pr_auc_pooled": 0.5799530446196166,
       "retry_failure_precision": 0.9007633587786259,
       "retry_failure_recall": 0.21532846715328466,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.10468163341283798,
       "retry_flagged_share": 0.15595238095238095
     },
@@ -206,7 +195,6 @@
       "pr_auc_pooled": 0.5796539160999499,
       "retry_failure_precision": 0.902542372881356,
       "retry_failure_recall": 0.19434306569343066,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.014036419801414013,
       "retry_flagged_share": 0.14047619047619048
     },
@@ -221,11 +209,10 @@
       "pr_auc_std": 0.07891544625825442,
       "roc_auc_pooled": 0.5,
       "pr_auc_pooled": 0.3005821988534716,
-      "retry_failure_precision": NaN,
+      "retry_failure_precision": null,
       "retry_failure_recall": 0.0,
-      "retry_threshold": NaN,
-      "retry_threshold_p_success": NaN,
-      "retry_flagged_share": NaN
+      "retry_threshold_p_success": null,
+      "retry_flagged_share": 0.0
     },
     {
       "k": 5,
@@ -240,7 +227,6 @@
       "pr_auc_pooled": 0.49287318069738845,
       "retry_failure_precision": 0.9,
       "retry_failure_recall": 0.2154696132596685,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.14366084337234497,
       "retry_flagged_share": 0.1597051597051597
     },
@@ -257,7 +243,6 @@
       "pr_auc_pooled": 0.5345522505503701,
       "retry_failure_precision": 0.9003215434083601,
       "retry_failure_recall": 0.2578268876611418,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.1080726757645607,
       "retry_flagged_share": 0.19103194103194104
     },
@@ -274,7 +259,6 @@
       "pr_auc_pooled": 0.5360226892447435,
       "retry_failure_precision": 0.902127659574468,
       "retry_failure_recall": 0.19521178637200737,
-      "retry_threshold": NaN,
       "retry_threshold_p_success": 0.01230937521904707,
       "retry_flagged_share": 0.14434889434889434
     }

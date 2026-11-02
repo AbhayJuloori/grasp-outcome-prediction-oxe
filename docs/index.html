@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Early Grasp Outcome Prediction</title>
+<meta name="description" content="Predicting robot grasp failure from the first control steps of Open X-Embodiment kuka episodes, plus UCI force/torque failure classification.">
+<style>
+:root { --bg:#fbfbfa; --fg:#1d1f23; --muted:#5c616b; --card:#ffffff; --line:#e3e4e7; --accent:#2f6fb0; }
+@media (prefers-color-scheme: dark) { :root { --bg:#16181c; --fg:#e8e9eb; --muted:#a2a7b0; --card:#1f2228; --line:#30343b; --accent:#6aa6e6; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; }
+main { max-width:960px; margin:0 auto; padding:40px 16px 64px; }
+h1 { font-size:1.9rem; line-height:1.2; margin:0 0 8px; }
+h2 { font-size:1.2rem; margin:40px 0 12px; }
+p.lede { color:var(--muted); margin:0 0 24px; max-width:720px; }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+.kpi { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
+.kpi b { display:block; font-size:1.5rem; font-variant-numeric:tabular-nums; }
+.kpi span { color:var(--muted); font-size:.85rem; }
+figure { margin:0; background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; }
+figure img { width:100%; height:auto; display:block; }
+figcaption { color:#5c616b; font-size:.85rem; padding:6px 4px 2px; }
+.grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:16px; }
+.tablewrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; font-size:.92rem; }
+th, td { text-align:right; padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
+th { color:var(--muted); font-weight:600; }
+a { color:var(--accent); }
+ul { padding-left:20px; }
+footer { color:var(--muted); font-size:.85rem; margin-top:48px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Early grasp outcome prediction</h1>
+<p class="lede">Predicting whether a robot grasp will fail from the first few control steps, early enough to abort and regrasp. Real Kuka bin-picking episodes from Open X-Embodiment, a DuckDB telemetry warehouse with SQL data quality checks, leave-one-robot-cell-out evaluation, and a second task classifying force/torque failure modes on the UCI Robot Execution Failures data.</p>
+
+<div class="kpis" id="kpis"></div>
+
+<h2>Grasp success from the first k steps</h2>
+<div class="grid2">
+<figure><img src="assets/roc_auc_by_k.png" alt="ROC AUC by number of observed steps for logistic regression, XGBoost and 1D CNN"><figcaption>Mean ± sd over 7 held-out robot cells. Chance is 0.5.</figcaption></figure>
+<figure><img src="assets/per_cell_auc_k3.png" alt="XGBoost ROC AUC on each held-out robot cell at k=3"><figcaption>XGBoost at k=3 on each cell it never saw in training.</figcaption></figure>
+</div>
+<div class="tablewrap"><table id="kuka"><thead><tr><th>k</th><th>Model</th><th>Episodes</th><th>ROC AUC</th><th>PR AUC</th><th>Failures caught at 90% precision</th></tr></thead><tbody></tbody></table></div>
+
+<h2>What drives the prediction</h2>
+<div class="grid2">
+<figure><img src="assets/shap_kuka_k3.png" alt="SHAP beeswarm of top early-window features"><figcaption>SHAP on XGBoost (k=3), fit on all episodes for interpretation only.</figcaption></figure>
+<figure><img src="assets/dq_summary.png" alt="Episodes flagged by each data quality check"><figcaption>Uncommanded jumps are dropped as corrupt; commanded large moves are kept because they are real failures.</figcaption></figure>
+</div>
+
+<h2>Failure mode classification (UCI)</h2>
+<figure><img src="assets/uci_macro_f1.png" alt="Macro F1 per UCI learning problem for majority, XGBoost and 1D CNN"><figcaption>Repeated stratified 5-fold x 3. Sets have 47 to 164 samples, so the error bars are wide.</figcaption></figure>
+
+<h2>How it was evaluated</h2>
+<ul>
+<li>Only the first k control steps are visible to the model; episodes that already ended are not scored.</li>
+<li>Episode length and the terminate action are excluded because they leak the outcome.</li>
+<li>Each fold holds out one physical robot cell. Hyperparameters were fixed up front.</li>
+<li>No shared public benchmark exists for this task on this subset; compare against the baselines shown.</li>
+</ul>
+
+<footer>Code, data pipeline and full limitations: <a href="https://github.com/AbhayJuloori/grasp-outcome-prediction-oxe">github.com/AbhayJuloori/grasp-outcome-prediction-oxe</a></footer>
+</main>
+<script>
+fetch("assets/metrics.json").then(r => r.json()).then(m => {
+  const f = (v, d = 3) => v == null ? "–" : Number(v).toFixed(d);
+  const best = m.kuka.filter(r => r.model === "xgboost" && r.k === 3)[0];
+  const kpis = [
+    [m.counts.episodes.toLocaleString(), "grasp episodes"],
+    [(m.counts.success_rate * 100).toFixed(1) + "%", "success rate"],
+    [m.cells.length, "robot cells (CV groups)"],
+    [f(best.roc_auc_mean), "ROC AUC, XGBoost at k=3"],
+    [(best.retry_failure_recall * 100).toFixed(0) + "%", "failures caught at 90% precision"],
+  ];
+  document.getElementById("kpis").innerHTML = kpis.map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+  document.querySelector("#kuka tbody").innerHTML = m.kuka.filter(r => r.model !== "prevalence").map(r =>
+    `<tr><td>${r.k}</td><td>${r.model}</td><td>${r.n_episodes}</td><td>${f(r.roc_auc_mean)} ± ${f(r.roc_auc_std)}</td><td>${f(r.pr_auc_mean)} ± ${f(r.pr_auc_std)}</td><td>${(r.retry_failure_recall * 100).toFixed(0)}%</td></tr>`).join("");
+}).catch(() => {});
+</script>
+</body>
+</html>
