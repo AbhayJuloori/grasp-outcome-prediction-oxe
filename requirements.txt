@@ -1,0 +1,14 @@
+numpy>=1.26
+pandas>=2.1
+pyarrow>=15
+duckdb>=1.0
+tfrecord>=1.14
+protobuf>=4.25
+scikit-learn>=1.4
+xgboost>=2.0
+torch>=2.2
+mlflow>=2.12
+shap>=0.45
+matplotlib>=3.8
+streamlit>=1.33
+pytest>=8

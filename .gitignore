@@ -1,0 +1,10 @@
+.venv/
+data/raw/
+data/parquet/
+data/*.duckdb
+mlruns/
+mlflow.db
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store

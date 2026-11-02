@@ -1,0 +1,9 @@
+[project]
+name = "grasp-outcome-prediction"
+version = "0.1.0"
+description = "Early grasp success prediction on Open X-Embodiment (kuka) telemetry and UCI robot failure classification"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
