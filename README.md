@@ -33,6 +33,7 @@ grasp.warehouse            DuckDB marts (dim_cell, episodes, steps) + SQL data q
 grasp.train_kuka           early-window features, logistic regression / XGBoost / 1D CNN, leave-one-cell-out CV
 grasp.uci                  failure mode classifiers, repeated stratified CV
 grasp.explain              SHAP on the XGBoost model
+grasp.tune_kuka            nested leave-one-cell-out tuning check (3 seeds, about 3 minutes)
 grasp.report               charts + metrics.json for the Pages site
 dags/grasp_pipeline.py     Airflow DAG wiring the steps above
 app/streamlit_app.py       fleet dashboard (failure rate, cycle length, anomaly flags per cell)
@@ -59,6 +60,8 @@ first/last markers, row count mismatches, and end effector jumps.
 The jump check was split in two after looking at the data: all 23 commanded
 large moves are failed grasps, so they are real behaviour. Dropping them as
 "bad data" would have removed easy failures and inflated the scores.
+
+![Data quality checks](docs/assets/dq_summary.png)
 
 ## Evaluation design
 
@@ -91,6 +94,30 @@ large moves are failed grasps, so they are real behaviour. Dropping them as
 Full sweep for k = 2..5 is in `artifacts/kuka_results.json` and on the Pages site.
 Per held-out cell, XGBoost at k=3 ranges from 0.648 to 0.758 ROC AUC.
 
+![ROC AUC by k](docs/assets/roc_auc_by_k.png)
+
+![ROC and PR curves at k=3](docs/assets/roc_pr_curves_k3.png)
+
+The curves pool every episode's out-of-fold score (each scored by the model
+that never saw its cell), so their AUCs differ slightly from the per-cell means
+in the table.
+
+![Per-cell AUC](docs/assets/per_cell_auc_k3.png)
+
+**Nested tuning check.** `grasp.tune_kuka` reruns XGBoost with a 24-config grid
+(depth, learning rate, trees, min child weight) chosen inside each outer fold by
+leave-one-cell-out on the six training cells only, so the held-out cell never
+touches the choice. Fixed and tuned models use the same three seeds (7, 11, 23);
+values are means over seeds of the 7-cell mean.
+
+| k | Fixed config ROC AUC | Tuned ROC AUC | Fixed PR AUC | Tuned PR AUC |
+|---:|---:|---:|---:|---:|
+| 3 | 0.705 (seed sd 0.001) | 0.709 (seed sd 0.003) | 0.568 | 0.574 |
+| 4 | 0.724 (seed sd 0.001) | 0.728 (seed sd 0.002) | 0.598 | 0.603 |
+
+Tuning adds about 0.004 ROC AUC, a tenth of the spread across cells (sd about
+0.04), so the fixed config in the table above is kept as the reported model.
+
 **Retry trigger.** Flagging the most confident predicted failures at k=3 so
 that at least 90% of flagged grasps really fail catches about **24% of all
 failures** (18% of attempts flagged). That is the operating point a "stop and
@@ -99,6 +126,8 @@ regrasp" rule would use.
 SHAP on the XGBoost model points mostly at the commanded vertical motion in the
 first steps (an arm that is not descending toward the object tends to fail)
 and at where the gripper sits in the bin.
+
+![SHAP summary](docs/assets/shap_kuka_k3.png)
 
 ### Failure mode classification (UCI, macro F1, 5-fold x 3 repeats)
 
@@ -112,6 +141,16 @@ and at where the gripper sits in the bin.
 
 The spread matters more than the mean here: with 47 samples, one fold can swing
 macro F1 by more than 0.15.
+
+![UCI macro F1](docs/assets/uci_macro_f1.png)
+
+### Fleet dashboard
+
+`make dashboard` serves a Streamlit view over the DuckDB warehouse: failure
+rate, cycle length and anomaly flags per robot cell, the model table, SHAP
+drivers and a per-episode telemetry trace.
+
+![Streamlit fleet dashboard](docs/assets/dashboard.png)
 
 ## Limitations
 
@@ -134,6 +173,7 @@ macro F1 by more than 0.15.
 make setup        # Python 3.11 venv via uv
 make all          # download, ingest, warehouse, train, uci, explain, report (about 5 minutes on a laptop CPU)
 make test         # pytest suite, synthetic data, no network
+make tune         # nested tuning check -> artifacts/kuka_tuning.json
 make dashboard    # Streamlit fleet dashboard
 ```
 

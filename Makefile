@@ -2,7 +2,7 @@ PY ?= .venv/bin/python
 export PYTHONPATH := src
 export OMP_NUM_THREADS := 1
 
-.PHONY: setup data ingest warehouse train uci explain report dashboard test all
+.PHONY: setup data ingest warehouse train tune uci explain report dashboard test all
 
 setup:
 	uv venv -p 3.11 .venv
@@ -19,6 +19,9 @@ warehouse:
 
 train:
 	$(PY) -m grasp.train_kuka
+
+tune:
+	$(PY) -m grasp.tune_kuka
 
 uci:
 	$(PY) -m grasp.uci

@@ -11,7 +11,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import (average_precision_score, precision_recall_curve, roc_auc_score,
+                             roc_curve)
 
 ART, ASSETS = Path("artifacts"), Path("docs/assets")
 COLORS = {"logreg": "#8a8f98", "xgboost": "#2f6fb0", "cnn1d": "#d0802f", "majority": "#c4c7cc"}
@@ -30,6 +31,26 @@ def roc_by_k(kuka: pd.DataFrame) -> None:
     ax.legend(frameon=False, ncol=4, loc="lower center")
     fig.tight_layout()
     fig.savefig(ASSETS / "roc_auc_by_k.png", dpi=150)
+
+
+def curves_k3() -> None:
+    """Pooled out-of-fold ROC and PR curves at k=3 (each episode scored by the fold that held out its cell)."""
+    oof = pd.read_parquet(ART / "kuka_oof_k3.parquet")
+    y = oof.success.to_numpy()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8.4, 3.6))
+    for model in ["logreg", "xgboost", "cnn1d"]:
+        fpr, tpr, _ = roc_curve(y, oof[model])
+        prec, rec, _ = precision_recall_curve(y, oof[model])
+        ax1.plot(fpr, tpr, color=COLORS[model], label=f"{model} ({roc_auc_score(y, oof[model]):.3f})")
+        ax2.plot(rec, prec, color=COLORS[model], label=f"{model} ({average_precision_score(y, oof[model]):.3f})")
+    ax1.plot([0, 1], [0, 1], ls="--", color="#999", lw=1)
+    ax2.axhline(y.mean(), ls="--", color="#999", lw=1, label=f"base rate ({y.mean():.3f})")
+    ax1.set(xlabel="false positive rate", ylabel="true positive rate", title="ROC, k=3 (pooled out-of-fold)")
+    ax2.set(xlabel="recall (success)", ylabel="precision (success)", title="Precision-recall, k=3", ylim=(0, 1.02))
+    ax1.legend(frameon=False, fontsize=8, loc="lower right")
+    ax2.legend(frameon=False, fontsize=8, loc="upper right")
+    fig.tight_layout()
+    fig.savefig(ASSETS / "roc_pr_curves_k3.png", dpi=150)
 
 
 def per_cell(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
@@ -92,6 +113,7 @@ def main() -> None:
                      "(SELECT count(*) FROM steps) AS steps, "
                      "(SELECT avg(success) FROM episodes) AS success_rate").df().iloc[0]
     roc_by_k(kuka)
+    curves_k3()
     cells = per_cell(con)
     dq_chart(dq)
     uci_chart(uci)

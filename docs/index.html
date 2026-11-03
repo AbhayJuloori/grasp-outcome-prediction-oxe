@@ -42,6 +42,7 @@ footer { color:var(--muted); font-size:.85rem; margin-top:48px; }
 <h2>Grasp success from the first k steps</h2>
 <div class="grid2">
 <figure><img src="assets/roc_auc_by_k.png" alt="ROC AUC by number of observed steps for logistic regression, XGBoost and 1D CNN"><figcaption>Mean ± sd over 7 held-out robot cells. Chance is 0.5.</figcaption></figure>
+<figure><img src="assets/roc_pr_curves_k3.png" alt="Pooled out-of-fold ROC and precision-recall curves at k=3 for logistic regression, XGBoost and 1D CNN"><figcaption>Pooled out-of-fold curves at k=3; each episode is scored by the model that never saw its cell.</figcaption></figure>
 <figure><img src="assets/per_cell_auc_k3.png" alt="XGBoost ROC AUC on each held-out robot cell at k=3"><figcaption>XGBoost at k=3 on each cell it never saw in training.</figcaption></figure>
 </div>
 <div class="tablewrap"><table id="kuka"><thead><tr><th>k</th><th>Model</th><th>Episodes</th><th>ROC AUC</th><th>PR AUC</th><th>Failures caught at 90% precision</th></tr></thead><tbody></tbody></table></div>
